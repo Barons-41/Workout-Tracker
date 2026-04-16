@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { HEATMAP_MUSCLES } from "./constants";
 import { StatCard, s, C } from "./ui";
 
@@ -159,6 +160,19 @@ export default function DashboardTab({ history, split, setTab, setStartDay }) {
 
   return (
     <div>
+      {/* Logo header */}
+      <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 20 }}>
+        <Image
+          src="/logo.jpeg"
+          alt="Forge"
+          width={44}
+          height={44}
+          style={{ borderRadius: 10 }}
+          priority
+        />
+        <span style={{ fontSize: 20, fontWeight: 700, color: C.text, letterSpacing: "-0.3px" }}>Forge</span>
+      </div>
+
       <div style={{ marginBottom: 18 }}>
         <div style={{ fontSize: 22, fontWeight: 700, color: C.text, lineHeight: 1.1 }}>
           Good {now.getHours() < 12 ? "morning" : now.getHours() < 17 ? "afternoon" : "evening"}

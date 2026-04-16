@@ -1,6 +1,6 @@
 {
-  "name": "Workout Tracker",
-  "short_name": "Workouts",
+  "name": "Forge",
+  "short_name": "Forge",
   "description": "Track your workouts, body stats, and PRs",
   "start_url": "/",
   "display": "standalone",

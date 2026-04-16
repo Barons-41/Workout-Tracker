@@ -10,13 +10,18 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <head>
+        {/* Favicon */}
+        <link rel="shortcut icon" href="/favicon.ico" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/icons/icon-32.png" />
+        <link rel="icon" type="image/png" sizes="16x16" href="/icons/icon-16.png" />
+
         {/* PWA manifest */}
         <link rel="manifest" href="/manifest.json" />
 
         {/* iOS home screen support */}
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-        <meta name="apple-mobile-web-app-title" content="Workouts" />
+        <meta name="apple-mobile-web-app-title" content="Forge" />
         <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
 
         {/* Theme colour for browser chrome */}
