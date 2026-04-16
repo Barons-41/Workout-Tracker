@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { MUSCLE_GROUPS, DEFAULT_RANGES } from "./constants";
 import { getVolumeRanges, saveVolumeRanges } from "../lib/db";
-import { Toast, s, C } from "./ui";
+import { Toast, s, C, MONO } from "./ui";
 
 export default function VolumeTab({ history }) {
   const [ranges, setRanges] = useState(DEFAULT_RANGES);
@@ -47,6 +47,14 @@ export default function VolumeTab({ history }) {
 
   const maxVal = Math.max(...MUSCLE_GROUPS.map((m) => vol[m]), 20, 1);
 
+  // Gold for on-track, amber for low, red for high, gray for none
+  const getColor = (sets, min, max) => {
+    if (sets === 0) return "#3a3a3a";
+    if (sets < min) return "#a88430";
+    if (sets > max) return "#e24b4a";
+    return "#c8a857";
+  };
+
   const saveRanges = () => {
     saveVolumeRanges(localRanges);
     setRanges(localRanges);
@@ -57,53 +65,77 @@ export default function VolumeTab({ history }) {
   return (
     <div>
       <Toast msg={toast} />
-      <div style={{ fontSize: 12, color: "#666", marginBottom: 14 }}>Week of {weekLabel}</div>
-      <div style={{ display: "flex", gap: 16, marginBottom: 12, flexWrap: "wrap" }}>
-        {[["#1D9E75","on track"],["#BA7517","low"],["#E24B4A","too high"],["#888780","none"]].map(([c, l]) => (
-          <div key={l} style={{ display: "flex", alignItems: "center", gap: 5, fontSize: 12, color: "#aaa" }}>
-            <div style={{ width: 10, height: 10, borderRadius: 2, background: c }} />{l}
+
+      {/* Week header */}
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
+        <div style={{ fontSize: 10, color: C.textMuted, fontFamily: MONO, letterSpacing: "0.12em", textTransform: "uppercase" }}>
+          Week of {weekLabel}
+        </div>
+      </div>
+
+      {/* Legend */}
+      <div style={{ display: "flex", gap: 16, marginBottom: 16, flexWrap: "wrap" }}>
+        {[["#c8a857", "on track"], ["#a88430", "low"], ["#e24b4a", "too high"], ["#3a3a3a", "none"]].map(([c, l]) => (
+          <div key={l} style={{ display: "flex", alignItems: "center", gap: 5, fontSize: 10, color: C.textMuted, fontFamily: MONO, letterSpacing: "0.08em" }}>
+            <div style={{ width: 8, height: 8, borderRadius: 2, background: c }} />{l}
           </div>
         ))}
       </div>
+
+      {/* Volume bars */}
       {MUSCLE_GROUPS.map((m) => {
         const sets = vol[m], { min, max } = ranges[m];
-        const color = sets === 0 ? "#888780" : sets < min ? "#BA7517" : sets > max ? "#E24B4A" : "#1D9E75";
+        const color = getColor(sets, min, max);
         const pct = Math.min(sets / maxVal * 100, 100);
-        const minPct = min / maxVal * 100, maxPct = Math.min(max / maxVal * 100, 100);
+        const minPct = min / maxVal * 100;
+        const maxPct = Math.min(max / maxVal * 100, 100);
         return (
-          <div key={m} style={{ marginBottom: 10 }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 3 }}>
-              <span style={{ fontSize: 13, color: "#f0f0f0" }}>{m}</span>
-              <span style={{ fontSize: 12, color: "#aaa" }}>{sets} sets <span style={{ color: "#666" }}>({min}–{max})</span></span>
+          <div key={m} style={{ marginBottom: 12 }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 4 }}>
+              <span style={{ fontSize: 12, color: C.text, textTransform: "capitalize" }}>{m}</span>
+              <span style={{ fontSize: 11, fontFamily: MONO, color: C.textSub }}>
+                <span style={{ color }}>{sets}</span>
+                <span style={{ color: C.textDim }}> ({min}–{max})</span>
+              </span>
             </div>
-            <div style={{ height: 14, background: "#242424", borderRadius: 4, position: "relative" }}>
+            <div style={{ height: 12, background: C.surfaceAlt, borderRadius: 4, position: "relative", border: `1px solid ${C.borderAlt}` }}>
               <div style={{ position: "absolute", top: 0, left: 0, height: "100%", width: `${pct}%`, background: color, borderRadius: 4, minWidth: sets > 0 ? 2 : 0 }} />
-              <div style={{ position: "absolute", top: -3, height: 20, left: `${minPct}%`, width: `${Math.max(maxPct - minPct, 0.5)}%`, background: "rgba(255,255,255,0.07)", borderLeft: `1.5px solid ${color === "#888780" ? "#555" : color}`, borderRight: `1.5px solid ${color === "#888780" ? "#555" : color}` }} />
+              <div style={{
+                position: "absolute", top: -2, height: "calc(100% + 4px)",
+                left: `${minPct}%`,
+                width: `${Math.max(maxPct - minPct, 0.5)}%`,
+                background: "rgba(255,255,255,0.04)",
+                borderLeft: `1.5px solid ${color === "#3a3a3a" ? "#444" : color + "88"}`,
+                borderRight: `1.5px solid ${color === "#3a3a3a" ? "#444" : color + "88"}`,
+              }} />
             </div>
           </div>
         );
       })}
+
+      {/* Edit ranges toggle */}
       <div style={{ marginTop: 20 }}>
-        <button onClick={() => setShowEdit(!showEdit)} style={{ ...s.outlineBtn, width: "100%", padding: "10px 14px" }}>
-          {showEdit ? "Hide" : "Edit"} optimal set ranges
+        <button onClick={() => setShowEdit(!showEdit)} style={{ ...s.outlineBtn, width: "100%", padding: "10px 14px", fontFamily: MONO, letterSpacing: "0.12em", fontSize: 10 }}>
+          {showEdit ? "HIDE" : "EDIT"} OPTIMAL SET RANGES
         </button>
       </div>
+
       {showEdit && (
         <div style={{ marginTop: 12 }}>
-          <div style={{ fontSize: 12, color: "#666", marginBottom: 10 }}>Sets per week — min and max</div>
+          <div style={{ fontSize: 10, color: C.textMuted, marginBottom: 12, fontFamily: MONO, letterSpacing: "0.1em" }}>SETS PER WEEK — MIN AND MAX</div>
           {MUSCLE_GROUPS.map((m) => (
-            <div key={m} style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8, padding: "8px 10px", ...s.cardSm }}>
-              <span style={{ flex: 1, fontSize: 13, color: "#f0f0f0" }}>{m}</span>
+            <div key={m} style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8, padding: "8px 12px", ...s.cardSm }}>
+              <span style={{ flex: 1, fontSize: 12, color: C.text, textTransform: "capitalize" }}>{m}</span>
               <input type="number" inputMode="numeric" value={localRanges[m].min}
                 onChange={(e) => setLocalRanges((p) => ({ ...p, [m]: { ...p[m], min: parseInt(e.target.value) || 0 } }))}
-                style={{ width: 44, padding: "4px 6px", ...s.input }} />
-              <span style={{ fontSize: 12, color: "#666" }}>–</span>
+                style={{ width: 44, padding: "4px 6px", ...s.input, textAlign: "center", fontFamily: MONO, fontSize: 13 }} />
+              <span style={{ fontSize: 11, color: C.textDim, fontFamily: MONO }}>–</span>
               <input type="number" inputMode="numeric" value={localRanges[m].max}
                 onChange={(e) => setLocalRanges((p) => ({ ...p, [m]: { ...p[m], max: parseInt(e.target.value) || 0 } }))}
-                style={{ width: 44, padding: "4px 6px", ...s.input }} />
+                style={{ width: 44, padding: "4px 6px", ...s.input, textAlign: "center", fontFamily: MONO, fontSize: 13 }} />
             </div>
           ))}
-          <button onClick={saveRanges} style={{ ...s.greenBtn, marginTop: 12 }}>Save ranges</button>
+          <button onClick={saveRanges} style={{ ...s.greenBtn, marginTop: 12 }}>▸ SAVE RANGES</button>
         </div>
       )}
     </div>
