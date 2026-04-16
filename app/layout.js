@@ -25,7 +25,7 @@ export default function RootLayout({ children }) {
         <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
 
         {/* Theme colour for browser chrome */}
-        <meta name="theme-color" content="#151515" />
+        <meta name="theme-color" content="#141416" />
 
         {/* Viewport – prevent iOS auto-zoom on inputs */}
         <meta

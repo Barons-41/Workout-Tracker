@@ -76,7 +76,7 @@ export default function App() {
   }
 
   return (
-    <div style={{ ...s.bg, minHeight: "100vh", color: C.text, fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" }}>
+    <div style={{ ...s.bg, minHeight: "100vh", color: C.text, fontFamily: "-apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', sans-serif" }}>
       <div style={{ maxWidth: 480, margin: "0 auto", padding: "16px 14px" }}>
         <TabBar active={tab} setTab={setTab} />
         {tab === "home" && (
